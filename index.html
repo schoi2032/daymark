@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f7f8fc" />
+    <title>Daymark — Calendar</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <section class="auth-shell" id="authShell" aria-labelledby="authTitle">
+      <a class="brand" href="/" aria-label="Daymark home">daymark<span>.</span></a>
+      <div class="auth-card">
+        <p class="eyebrow" id="authEyebrow">Welcome back</p>
+        <h1 id="authTitle">Your days, in one place.</h1>
+        <p class="auth-copy" id="authCopy">Sign in to see your calendar.</p>
+        <form id="authForm">
+          <label class="field-label" for="emailInput">Email</label>
+          <input id="emailInput" type="email" autocomplete="email" placeholder="you@example.com" required />
+          <label class="field-label password-label" for="passwordInput">Password</label>
+          <input id="passwordInput" type="password" autocomplete="current-password" minlength="6" placeholder="At least 6 characters" required />
+          <p class="form-message" id="authMessage" role="status"></p>
+          <button class="save-button auth-submit" id="authSubmit" type="submit">Sign in</button>
+        </form>
+        <p class="auth-switch"><span id="authSwitchText">New to Daymark?</span> <button id="authSwitch" type="button">Create an account</button></p>
+      </div>
+    </section>
+
+    <main class="app-shell" id="calendarApp" hidden>
+      <header class="topbar">
+        <a class="brand" href="/" aria-label="Daymark home">daymark<span>.</span></a>
+        <button class="today-button" id="todayButton" type="button">Today</button>
+        <div class="month-navigation" aria-label="Calendar navigation">
+          <button class="icon-button" id="previousButton" type="button" aria-label="Previous month">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
+          </button>
+          <h1 id="monthLabel" aria-live="polite"></h1>
+          <button class="icon-button" id="nextButton" type="button" aria-label="Next month">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>
+          </button>
+        </div>
+        <div class="account-area">
+          <p class="hint">Click any day to add a task</p>
+          <button class="sign-out" id="signOutButton" type="button">Sign out</button>
+        </div>
+      </header>
+
+      <section class="schedule-toolbar" aria-label="Schedule view controls">
+        <div class="schedule-tabs" role="tablist" aria-label="Schedule type">
+          <button class="schedule-tab active" id="myScheduleButton" type="button" role="tab" aria-selected="true">My schedule</button>
+          <button class="schedule-tab" id="sharedScheduleButton" type="button" role="tab" aria-selected="false">Shared schedules</button>
+        </div>
+        <div class="share-id" id="shareIdArea">
+          <span>Your share ID</span>
+          <code id="userId"></code>
+          <button id="copyUserId" type="button">Copy</button>
+        </div>
+        <form class="shared-search" id="sharedSearchForm" hidden>
+          <label for="sharedUserId">User ID</label>
+          <input id="sharedUserId" type="text" autocomplete="off" placeholder="Paste a user's share ID" />
+          <button class="save-button" type="submit">View</button>
+        </form>
+      </section>
+      <p class="schedule-message" id="scheduleMessage" aria-live="polite">Only you can see private tasks.</p>
+
+      <section class="calendar" id="calendar" aria-label="Monthly calendar">
+        <div class="weekday-row" aria-hidden="true">
+          <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+        </div>
+        <div class="calendar-grid" id="calendarGrid"></div>
+      </section>
+    </main>
+
+    <dialog class="task-dialog" id="taskDialog" aria-labelledby="dialogTitle">
+      <form id="taskForm">
+        <div class="dialog-header">
+          <div>
+            <p class="eyebrow" id="dialogMode">New task</p>
+            <h2 id="dialogTitle">Plan something</h2>
+          </div>
+          <button class="close-button" type="button" id="closeButton" aria-label="Close dialog">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
+          </button>
+        </div>
+
+        <label class="field-label" for="taskTitle">Task</label>
+        <input id="taskTitle" name="title" type="text" autocomplete="off" placeholder="What needs to be done?" maxlength="100" required />
+
+        <div class="field-pair">
+          <div>
+            <label class="field-label" for="taskDate">Date</label>
+            <input id="taskDate" name="date" type="date" required />
+          </div>
+          <div>
+            <label class="field-label" for="taskTime">Time <span>optional</span></label>
+            <input id="taskTime" name="time" type="time" />
+          </div>
+        </div>
+
+        <label class="field-label category-label" for="taskCategory">Category</label>
+        <select id="taskCategory" name="category">
+          <option value="">No category</option>
+          <option value="work">Work</option>
+          <option value="personal">Personal</option>
+          <option value="study">Study</option>
+          <option value="health">Health</option>
+        </select>
+
+        <label class="field-label category-label" for="taskVisibility">Visibility</label>
+        <select id="taskVisibility" name="visibility">
+          <option value="private">Private — only me</option>
+          <option value="viewable">Viewable — anyone with my share ID</option>
+        </select>
+
+        <label class="completion-field" for="taskCompleted">
+          <input id="taskCompleted" name="completed" type="checkbox" />
+          <span class="checkmark" aria-hidden="true"></span>
+          Mark this task as completed
+        </label>
+
+        <div class="dialog-actions">
+          <button class="delete-button" id="deleteButton" type="button">Delete task</button>
+          <div class="right-actions">
+            <button class="text-button" id="cancelButton" type="button">Cancel</button>
+            <button class="save-button" type="submit">Save task</button>
+          </div>
+        </div>
+      </form>
+    </dialog>
+
+    <template id="taskTemplate">
+      <div class="task-chip">
+        <span class="completion-dot" aria-hidden="true"></span>
+        <span class="task-time"></span>
+        <span class="task-title"></span>
+      </div>
+    </template>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
